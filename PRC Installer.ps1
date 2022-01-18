@@ -6,7 +6,7 @@ function CreateSchedTask () {
     $Trigger = @()
     $Trigger += New-ScheduledTaskTrigger -AtLogon
     $Trigger += New-ScheduledTaskTrigger -Daily -At 12pm
-    $Settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -WakeToRun
+    $Settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -WakeToRun -StartWhenAvailable
     $Principal = New-ScheduledTaskPrincipal -UserId $Env:Username -LogonType Interactive
     Register-ScheduledTask -Action $Action -Trigger $Trigger -Settings $Settings -Principal $Principal -TaskName "(MSP) Pending Reboot Checker" -Description "Monitors for pending reboots." | Out-Null
     if(!(Get-ScheduledTask -TaskName "(MSP) Pending Reboot Checker" -ErrorAction SilentlyContinue)){
