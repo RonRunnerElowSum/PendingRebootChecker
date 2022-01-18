@@ -81,23 +81,8 @@ function RebootConf () {
     $RebootConfForm.ShowDialog()
 }
 
-function InstallPSWindowsUpdate () {
-    Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser -Force -ErrorAction SilentlyContinue
-    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    Install-PackageProvider -Name NuGet -Force | Out-Null
-    Install-Module PSWindowsUpdate -Force | Out-Null
-    Import-Module PSWindowsUpdate -Force | Out-Null
-    if(!(Get-Module | Select-Object -ExpandProperty Name | Select-String PSWindowsUpdate)){
-        Write-Warning "The module PSWindowsUpdate failed to install...exiting..."
-        EXIT
-    }
-}
-
 function PunchIt () {
-    if(!(Get-Module -Name "PSWindowsUpdate")){
-        InstallPSWindowsUpdate
-    }
-    $PendingRebootStatus = Get-WURebootStatus -Silent -CancelReboot
+    $PendingRebootStatus = Test-Path -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired"
     $WMIInfo = Get-WMIObject -Class Win32_OperatingSystem
     $LastBootTime = $WMIInfo.ConvertToDateTime($WMIInfo.LastBootUpTime)
     $SysUpTime = (Get-Date) - $LastBootTime
