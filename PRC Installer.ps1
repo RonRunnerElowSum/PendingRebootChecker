@@ -13,12 +13,10 @@ function CreateSchedTask () {
     $Principal = New-ScheduledTaskPrincipal -GroupId "BUILTIN\Users"
     Register-ScheduledTask -Action $Action -Trigger $Trigger -Settings $Settings -Principal $Principal -TaskName $TaskName -Description "Monitors for pending reboots." | Out-Null
     if(!(Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue)){
-        Write-Warning "Failed to create schedule task...exiting..."
-        EXIT
+        Write-Warning "Failed to create schedule task..."
     }
     else{
         Write-Host "Successfully installed Pending Reboot Checker!"
-        EXIT
     }
 }
 
