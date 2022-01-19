@@ -1,50 +1,29 @@
 function RestartMachine () {
-    if(!(Test-Path -Path "C:\Windows\Temp")){New-Item -Path "C:\Windows" -Name "Temp" -ItemType "directory" -ErrorAction SilentlyContinue | Out-Null}
-    if(!(Test-Path -Path "C:\Windows\Temp\PRC")){New-Item -Path "C:\Windows\Temp" -Name "PRC" -ItemType "directory" -ErrorAction SilentlyContinue | Out-Null}
-    if(!(Test-Path -Path "C:\Windows\Temp\PRC\_Archive")){New-Item -Path "C:\Windows\Temp\PRC" -Name "_Archive" -ItemType "directory" -ErrorAction SilentlyContinue | Out-Null}
-    if(!(Test-Path -Path "C:\Windows\Temp\PRC\Pending-Reboot-Checker-Approved.txt")){
-        New-Item -Path "C:\Windows\Temp\PRC" -Name "Pending-Reboot-Checker-Approved.txt" -ItemType "file" | Out-Null
-    }
-    $DateTime = (Get-Date)
     $ShortDateTime = (Get-Date -Format MMddyyyyHHmm)
-    Add-Content "C:\Windows\Temp\PRC\Pending-Reboot-Checker-Approved.txt" "Reboot request approved by $Env:USERNAME on $DateTime"
-    Move-Item -Path "C:\Windows\Temp\PRC\Pending-Reboot-Checker-Denies.txt" -Destination "C:\Windows\Temp\PRC\_Archive\Pending-Reboot-Checker-Denies_$ShortDateTime.txt" | Out-Null
+    Write-PRCLog "Reboot request approved by $Env:USERNAME"
+    Move-Item -Path "C:\Windows\Temp\MSP\Logs\PendingRebootChecker\PRCLog-$CurrentMonthYear.log" -Destination "C:\Windows\Temp\MSP\Logs\PendingRebootChecker\_Archive\PRCLog-$CurrentMonthYear_$ShortDateTime.log" | Out-Null
     Restart-Computer -Force
 }
 
 function RebootDeny () {
     if($Form.ishandlecreated){$Form.Close()}
     if($RebootConfForm.ishandlecreated){$RebootConfForm.Close()}
-    if(!(Test-Path -Path "C:\Windows\Temp")){New-Item -Path "C:\Windows" -Name "Temp" -ItemType "directory" -ErrorAction SilentlyContinue | Out-Null}
-    if(!(Test-Path -Path "C:\Windows\Temp\PRC")){New-Item -Path "C:\Windows\Temp" -Name "PRC" -ItemType "directory" -ErrorAction SilentlyContinue | Out-Null}
-    if(!(Test-Path -Path "C:\Windows\Temp\PRC\_Archive")){New-Item -Path "C:\Windows\Temp\PRC" -Name "_Archive" -ItemType "directory" -ErrorAction SilentlyContinue | Out-Null}
-    if(!(Test-Path -Path "C:\Windows\Temp\PRC\Pending-Reboot-Checker-Denies.txt")){
-        $DateTime = (Get-Date)
-        New-Item -Path "C:\Windows\Temp\PRC" -Name "Pending-Reboot-Checker-Denies.txt" -ItemType "file" | Out-Null
-        Add-Content "C:\Windows\Temp\PRC\Pending-Reboot-Checker-Denies.txt" "1 --- Reboot request denied by $Env:USERNAME on $DateTime"
-    }
-    else{
-        if($Form.ishandlecreated){$Form.Close()}
-        if($RebootConfForm.ishandlecreated){$RebootConfForm.Close()}
-        $RebootDenyCount = (Get-Content -Path "C:\Windows\Temp\PRC\Pending-Reboot-Checker-Denies.txt" | Select-Object -last 1)
-        $DateTime = (Get-Date)
-        if($RebootDenyCount | Select-String "1 ---"){Add-Content "C:\Windows\Temp\PRC\Pending-Reboot-Checker-Denies.txt" "2 --- Reboot request denied by $Env:USERNAME on $DateTime"}
-        if($RebootDenyCount | Select-String "2 ---"){Add-Content "C:\Windows\Temp\PRC\Pending-Reboot-Checker-Denies.txt" "3 --- Reboot request denied by $Env:USERNAME on $DateTime"}
-        if($RebootDenyCount | Select-String "3 ---"){Add-Content "C:\Windows\Temp\PRC\Pending-Reboot-Checker-Denies.txt" "4 --- Reboot request denied by $Env:USERNAME on $DateTime"}
-        if($RebootDenyCount | Select-String "4 ---"){Add-Content "C:\Windows\Temp\PRC\Pending-Reboot-Checker-Denies.txt" "5 --- Reboot request denied by $Env:USERNAME on $DateTime"}
-        if($RebootDenyCount | Select-String "5 ---"){Add-Content "C:\Windows\Temp\PRC\Pending-Reboot-Checker-Denies.txt" "6 --- Reboot request denied by $Env:USERNAME on $DateTime"}
-        if($RebootDenyCount | Select-String "6 ---"){Add-Content "C:\Windows\Temp\PRC\Pending-Reboot-Checker-Denies.txt" "7 --- Reboot request denied by $Env:USERNAME on $DateTime"}
-        if($RebootDenyCount | Select-String "7 ---"){Add-Content "C:\Windows\Temp\PRC\Pending-Reboot-Checker-Denies.txt" "8 --- Reboot request denied by $Env:USERNAME on $DateTime"}
-        if($RebootDenyCount | Select-String "8 ---"){Add-Content "C:\Windows\Temp\PRC\Pending-Reboot-Checker-Denies.txt" "9 --- Reboot request denied by $Env:USERNAME on $DateTime"}
-        if($RebootDenyCount | Select-String "9 ---"){
-            Add-Content "C:\Windows\Temp\PRC\Pending-Reboot-Checker-Denies.txt" "10 --- Reboot request denied by $Env:USERNAME on $DateTime"
-            $ShortDateTime = (Get-Date -Format MMddyyyyHHmm)
-            Move-Item -Path "C:\Windows\Temp\PRC\Pending-Reboot-Checker-Denies.txt" -Destination "C:\Windows\Temp\PRC\_Archive\Pending-Reboot-Checker-Denies_$ShortDateTime.txt" | Out-Null
-        }
-    }
+    Write-PRCLog "Reboot request denied by $Env:USERNAME"
+}
+
+function Write-PRCLog ($PRCLogEntryValue) {
+    $CurrentMonthYear = Get-Date -Format MMyyyy
+    if(!(Test-Path -Path "C:\Windows\Temp")){New-Item -Path "C:\Windows" -Name "Temp" -ItemType "Directory" | Out-Null}
+    if(!(Test-Path -Path "C:\Windows\Temp\MSP")){New-Item -Path "C:\Windows\Temp" -Name "MSP" -ItemType "Directory" | Out-Null}
+    if(!(Test-Path -Path "C:\Windows\Temp\MSP\Logs")){New-Item -Path "C:\Windows\Temp\MSP" -Name "Logs" -ItemType "Directory" | Out-Null}
+    if(!(Test-Path -Path "C:\Windows\Temp\MSP\Logs\PendingRebootChecker")){New-Item -Path "C:\Windows\Temp\MSP\Logs" -Name "PendingRebootChecker" -ItemType "Directory" | Out-Null}
+    if(!(Test-Path -Path "C:\Windows\Temp\MSP\Logs\PendingRebootChecker\_Archive")){New-Item -Path "C:\Windows\Temp\MSP\Logs\PendingRebootChecker" -Name "_Archive" -ItemType "Directory" | Out-Null}
+    if(!(Test-Path -Path "C:\Windows\Temp\MSP\Logs\PendingRebootChecker\PRCLog-$CurrentMonthYear.log")){New-Item -Path "C:\Windows\Temp\MSP\Logs\PendingRebootChecker" -Name "PRCLog-$CurrentMonthYear.log" -ItemType "File" | Out-Null}
+    Add-Content -Path "C:\Windows\Temp\MSP\Logs\PendingRebootChecker\PRCLog-$CurrentMonthYear.log" -Value "$(Get-Date) -- $PRCLogEntryValue"
 }
 
 function RebootConf () {
+    Write-PRCLog "Initial reboot request approved...confirming it's safe to reboot..."
     Add-Type -AssemblyName System.Windows.Forms
     Add-Type -AssemblyName System.Drawing
     $RebootConfForm = New-Object System.Windows.Forms.Form
@@ -82,11 +61,13 @@ function RebootConf () {
 }
 
 function PunchIt () {
+    Write-PRCLog "Starting..."
     $PendingRebootStatus = Test-Path -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired"
     $WMIInfo = Get-WMIObject -Class Win32_OperatingSystem
     $LastBootTime = $WMIInfo.ConvertToDateTime($WMIInfo.LastBootUpTime)
     $SysUpTime = (Get-Date) - $LastBootTime
     if(($PendingRebootStatus -eq "True") -or (7 -lt ($SysUpTime.Days))){
+        Write-PRCLog "$Env:ComputerName has a pending reboot..."
         Add-Type -AssemblyName System.Windows.Forms
         Add-Type -AssemblyName System.Drawing
         $Form = New-Object System.Windows.Forms.Form
@@ -123,6 +104,6 @@ function PunchIt () {
         $Form.ShowDialog()
     }
     else{
-        EXIT
+        Write-PRCLog "$env:ComputerName is not currently in a pending reboot state..."
     }
 }
