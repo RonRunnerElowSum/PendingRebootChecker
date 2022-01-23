@@ -1,5 +1,6 @@
 function RestartMachine () {
     $ShortDateTime = (Get-Date -Format MMddyyyyHHmm)
+    $CurrentMonthYear = Get-Date -Format MMyyyy
     Write-PRCLog "Reboot request approved by $Env:USERNAME"
     Move-Item -Path "C:\Windows\Temp\MSP\Logs\PendingRebootChecker\PRCLog-$CurrentMonthYear.log" -Destination "C:\Windows\Temp\MSP\Logs\PendingRebootChecker\_Archive\PRCLog-$CurrentMonthYear_$ShortDateTime.log" | Out-Null
     Restart-Computer -Force
