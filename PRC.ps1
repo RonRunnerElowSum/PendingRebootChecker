@@ -24,7 +24,8 @@ function Write-PRCLog ($PRCLogEntryValue) {
 
 function RebootConf () {
     Write-PRCLog "Initial reboot request approved...confirming it's safe to reboot..."
-    if([Microsoft.VisualBasic.Interaction]::MsgBox('Are you sure it is OK to restart?  This will close all open files and applications.  Save all of your work before restarting.', 'YesNo,MsgBoxSetForeground,Exclamation', 'IT Maintenance') -eq "NO"){
+    [void][System.Reflection.Assembly]::LoadWithPartialName("Microsoft.VisualBasic") 
+    if([Microsoft.VisualBasic.Interaction]::MsgBox('Are you sure it is OK to restart?  This will close all open files and applications.  Save all of your work before restarting.', 'YesNo,MsgBoxSetForeground,Exclamation', 'IT Maintenance') -eq "No"){
         RebootDeny
     }
     else{
@@ -41,7 +42,7 @@ function PunchIt () {
     if(($PendingRebootStatus -eq "True") -or (7 -lt ($SysUpTime.Days))){
         Write-PRCLog "$Env:ComputerName has a pending reboot..."
         [void][System.Reflection.Assembly]::LoadWithPartialName("Microsoft.VisualBasic") 
-        if([Microsoft.VisualBasic.Interaction]::MsgBox('Your computer needs to restart in order to finishing installing updates.  Restart now?', 'YesNo,MsgBoxSetForeground,Information', 'IT Maintenance') -eq "NO"){
+        if([Microsoft.VisualBasic.Interaction]::MsgBox('Your computer needs to restart in order to finishing installing updates.  Restart now?', 'YesNo,MsgBoxSetForeground,Information', 'IT Maintenance') -eq "No"){
             RebootDeny
         }
         else{
