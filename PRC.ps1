@@ -67,7 +67,7 @@ function PunchIt () {
     $SysUpTime = (Get-Date) - $LastBootTime
     if(($PendingRebootStatus -eq "True") -or (7 -lt ($SysUpTime.Days))){
         Write-PRCLog "$Env:ComputerName has a pending reboot..."
-        [void][System.Reflection.Assembly]::LoadWithPartialName("Microsoft.VisualBasic") 
+        [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.VisualBasic") 
         if([Microsoft.VisualBasic.Interaction]::MsgBox('Your computer needs to restart in order to finishing installing updates.  Restart now?', 'YesNo,MsgBoxSetForeground,Information', 'IT Maintenance') -eq "No"){
             RebootDeny
         }
