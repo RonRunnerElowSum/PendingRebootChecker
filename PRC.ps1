@@ -6,8 +6,6 @@ function RestartMachine () {
 }
 
 function RebootDeny () {
-    if($Form.ishandlecreated){$Form.Close()}
-    if($RebootConfForm.ishandlecreated){$RebootConfForm.Close()}
     Write-PRCLog "Reboot request denied by $Env:USERNAME"
 }
 
