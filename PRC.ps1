@@ -45,7 +45,7 @@ function ThrowToastNotification () {
     Unregister-Event -SourceIdentifier click_event -ErrorAction SilentlyContinue
     Register-ObjectEvent $ToastNotification BalloonTipClicked -SourceIdentifier click_event -Action {
         Write-PRCLog "Toast notification clicked...prompting to restart..."
-        [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.VisualBasic") 
+        #[System.Reflection.Assembly]::LoadWithPartialName("Microsoft.VisualBasic") 
         if([Microsoft.VisualBasic.Interaction]::MsgBox('Your computer needs to restart in order to finishing installing updates.  Restart now?', 'YesNo,MsgBoxSetForeground,Information', 'IT Maintenance') -eq "No"){
             RebootDeny
         }
