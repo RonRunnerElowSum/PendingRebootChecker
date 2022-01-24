@@ -31,6 +31,27 @@ function RebootConf () {
     }
 }
 
+function ThrowToastNotification () {
+    Write-PRCLog "Throwing reboot required toast notification..."
+    [System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms") | Out-Null
+    [System.Reflection.Assembly]::LoadWithPartialName("System.Drawing") | Out-Null
+    $ToastNotification = New-Object System.Windows.Forms.NotifyIcon
+    $ToastNotification.Icon = [System.Drawing.SystemIcons]::Information
+    $ToastNotification.BalloonTipText = "Your computer needs to restart in order to finishing installing updates. Please restart at your earliest convenience."
+    $ToastNotification.BalloonTipTitle = "Reboot Required"
+    $ToastNotification.BalloonTipIcon = "Warning"
+    $ToastNotification.Visible = $True
+    $ToastNotification.ShowBalloonTip(50000)
+    Unregister-Event -SourceIdentifier click_event -ErrorAction SilentlyContinue
+    Register-ObjectEvent $ToastNotification BalloonTipClicked -SourceIdentifier click_event -Action {
+        Write-PRCLog "Executing PRC..."
+        Start-ScheduledTask -TaskName '(MSP) Pending Reboot Checker'
+    } | Out-Null
+    Wait-Event -Timeout 10 -SourceIdentifier click_event > $null
+    Unregister-Event -SourceIdentifier click_event -ErrorAction SilentlyContinue
+    $ToastNotification.Dispose()
+}
+
 function PunchIt () {
     Write-PRCLog "Starting..."
     $PendingRebootStatus = Test-Path -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired"
