@@ -42,20 +42,7 @@ function ThrowToastNotification () {
     $ToastNotification.BalloonTipIcon = "Warning"
     $ToastNotification.Visible = $True
     $ToastNotification.ShowBalloonTip(50000)
-    Unregister-Event -SourceIdentifier click_event -ErrorAction SilentlyContinue
-    Register-ObjectEvent $ToastNotification BalloonTipClicked -SourceIdentifier click_event -Action {
-        Write-PRCLog "Toast notification clicked...prompting to restart..."
-        [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.VisualBasic") 
-        if([Microsoft.VisualBasic.Interaction]::MsgBox('Your computer needs to restart in order to finishing installing updates.  Restart now?', 'YesNo,MsgBoxSetForeground,Information', 'IT Maintenance') -eq "No"){
-            RebootDeny
-        }
-        else{
-            RebootConf
-        }
-    } | Out-Null
-    #Wait-Event -Timeout 10 -SourceIdentifier click_event > $null
     Start-Sleep -Seconds 10
-    Unregister-Event -SourceIdentifier click_event -ErrorAction SilentlyContinue
     $ToastNotification.Dispose()
 }
 
