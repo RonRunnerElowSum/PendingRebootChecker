@@ -32,7 +32,7 @@ function RebootConf () {
 }
 
 function ThrowToastNotification () {
-    Write-PRCLog "Throwing reboot required toast notification..."
+    #Write-PRCLog "Throwing reboot required toast notification..."
     [System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms") | Out-Null
     [System.Reflection.Assembly]::LoadWithPartialName("System.Drawing") | Out-Null
     $ToastNotification = New-Object System.Windows.Forms.NotifyIcon
@@ -44,7 +44,7 @@ function ThrowToastNotification () {
     $ToastNotification.ShowBalloonTip(50000)
     Unregister-Event -SourceIdentifier click_event -ErrorAction SilentlyContinue
     Register-ObjectEvent $ToastNotification BalloonTipClicked -SourceIdentifier click_event -Action {
-        Write-PRCLog "Executing PRC..."
+        #Write-PRCLog "Executing PRC..."
         Start-ScheduledTask -TaskName '(MSP) Pending Reboot Checker'
     } | Out-Null
     Wait-Event -Timeout 10 -SourceIdentifier click_event > $null
