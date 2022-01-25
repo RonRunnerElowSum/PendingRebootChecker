@@ -2,7 +2,7 @@ $TaskName = "(MSP) Throw Reboot Required Toast Notification"
 $PSFileURL = "'https://raw.githubusercontent.com/RonRunnerElowSum/PendingRebootChecker/Prod-Branch/PRC.ps1'"
 
 $ScheduledTaskCmd = "Invoke-WebRequest -URI $PSFileURL -UseBasicParsing | Invoke-Expression; ThrowToastNotification"
-$ScheduledTaskArg = "-WindowStyle Hidden -Command `"& {$ScheduledTaskCmd}`""
+$ScheduledTaskArg = "-WindowStyle Hidden -NoExit -Command `"& {$ScheduledTaskCmd}`""
 
 function CreateSchedTask () {
     $Action = New-ScheduledTaskAction -Execute 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe' -Argument $ScheduledTaskArg
