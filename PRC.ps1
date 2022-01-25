@@ -32,33 +32,39 @@ function RebootConf () {
 }
 
 function ThrowToastNotification () {
-    Write-PRCLog "Throwing reboot required toast notification..."
-    [System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms") | Out-Null
-    [System.Reflection.Assembly]::LoadWithPartialName("System.Drawing") | Out-Null
-    $ToastNotification = New-Object System.Windows.Forms.NotifyIcon
-    $ToastNotification.Icon = [System.Drawing.SystemIcons]::Information
-    $ToastNotification.BalloonTipText = "Your computer needs to restart in order to finishing installing updates. Please restart at your earliest convenience."
-    $ToastNotification.BalloonTipTitle = "Reboot Required"
-    $ToastNotification.BalloonTipIcon = "Warning"
-    $ToastNotification.Visible = $True
-    $ToastNotification.ShowBalloonTip(50000)
-   
-    Unregister-Event -SourceIdentifier click_event -ErrorAction SilentlyContinue
-    Register-ObjectEvent $ToastNotification BalloonTipClicked -SourceIdentifier click_event -Action {
-        Write-PRCLog "Toast notification clicked...prompting to restart..."
-        [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.VisualBasic") 
-        if([Microsoft.VisualBasic.Interaction]::MsgBox('Your computer needs to restart in order to finishing installing updates.  Restart now?', 'YesNo,MsgBoxSetForeground,Information', 'IT Maintenance') -eq "No"){
-            RebootDeny
-        }
-        else{
-            RebootConf
-        }
-    } | Out-Null
-    Wait-Event -Timeout 10 -SourceIdentifier click_event > $null
-    Unregister-Event -SourceIdentifier click_event -ErrorAction SilentlyContinue
-    
-    #Start-Sleep -Seconds 10
-    $ToastNotification.Dispose()
+    $PendingRebootStatus = Test-Path -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired"
+    if($PendingRebootStatus -eq "True"){
+        Write-PRCLog "Throwing reboot required toast notification..."
+        [System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms") | Out-Null
+        [System.Reflection.Assembly]::LoadWithPartialName("System.Drawing") | Out-Null
+        $ToastNotification = New-Object System.Windows.Forms.NotifyIcon
+        $ToastNotification.Icon = [System.Drawing.SystemIcons]::Information
+        $ToastNotification.BalloonTipText = "Your computer needs to restart in order to finishing installing updates. Please restart at your earliest convenience."
+        $ToastNotification.BalloonTipTitle = "Reboot Required"
+        $ToastNotification.BalloonTipIcon = "Warning"
+        $ToastNotification.Visible = $True
+        $ToastNotification.ShowBalloonTip(50000)
+       
+        Unregister-Event -SourceIdentifier click_event -ErrorAction SilentlyContinue
+        Register-ObjectEvent $ToastNotification BalloonTipClicked -SourceIdentifier click_event -Action {
+            Write-PRCLog "Toast notification clicked...prompting to restart..."
+            [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.VisualBasic") 
+            if([Microsoft.VisualBasic.Interaction]::MsgBox('Your computer needs to restart in order to finishing installing updates.  Restart now?', 'YesNo,MsgBoxSetForeground,Information', 'IT Maintenance') -eq "No"){
+                RebootDeny
+            }
+            else{
+                RebootConf
+            }
+        } | Out-Null
+        Wait-Event -Timeout 10 -SourceIdentifier click_event > $null
+        Unregister-Event -SourceIdentifier click_event -ErrorAction SilentlyContinue
+        
+        #Start-Sleep -Seconds 10
+        $ToastNotification.Dispose()
+    }
+    else{
+        Write-PRCLog "$env:ComputerName is not currently in a pending reboot state..."
+    }
 }
 
 function PunchIt () {
