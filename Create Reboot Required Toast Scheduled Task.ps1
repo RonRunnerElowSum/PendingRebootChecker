@@ -16,7 +16,7 @@ function CreateSchedTask () {
         Write-Host "Successfully installed ($TaskName)!"
     }
 }
-<##>
+
 function PunchIt () {
     if(!(Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue)){
         CreateSchedTask
