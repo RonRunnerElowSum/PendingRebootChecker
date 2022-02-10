@@ -39,7 +39,7 @@ function ThrowToastNotification () {
         [System.Reflection.Assembly]::LoadWithPartialName("System.Drawing") | Out-Null
         $ToastNotification = New-Object System.Windows.Forms.NotifyIcon
         $ToastNotification.Icon = [System.Drawing.SystemIcons]::Information
-        $ToastNotification.BalloonTipText = "Your computer needs to restart in order to finishing installing updates. Please restart at your earliest convenience."
+        $ToastNotification.BalloonTipText = "Your computer needs to restart in order to finish installing updates. Please restart at your earliest convenience."
         $ToastNotification.BalloonTipTitle = "Reboot Required"
         $ToastNotification.BalloonTipIcon = "Warning"
         $ToastNotification.Visible = $True
@@ -49,7 +49,7 @@ function ThrowToastNotification () {
         Register-ObjectEvent $ToastNotification BalloonTipClicked -SourceIdentifier click_event -Action {
             Write-PRCLog "Toast notification clicked...prompting to restart..."
             [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.VisualBasic") 
-            if([Microsoft.VisualBasic.Interaction]::MsgBox('Your computer needs to restart in order to finishing installing updates.  Restart now?', 'YesNo,MsgBoxSetForeground,Information', 'IT Maintenance') -eq "No"){
+            if([Microsoft.VisualBasic.Interaction]::MsgBox('Your computer needs to restart in order to finish installing updates.  Restart now?', 'YesNo,MsgBoxSetForeground,Information', 'IT Maintenance') -eq "No"){
                 RebootDeny
             }
             else{
@@ -76,7 +76,7 @@ function PunchIt () {
     if(($PendingRebootStatus -eq "True") -or (7 -lt ($SysUpTime.Days))){
         Write-PRCLog "$Env:ComputerName has a pending reboot..."
         [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.VisualBasic") 
-        if([Microsoft.VisualBasic.Interaction]::MsgBox('Your computer needs to restart in order to finishing installing updates.  Restart now?', 'YesNo,MsgBoxSetForeground,Information', 'IT Maintenance') -eq "No"){
+        if([Microsoft.VisualBasic.Interaction]::MsgBox('Your computer needs to restart in order to finish installing updates.  Restart now?', 'YesNo,MsgBoxSetForeground,Information', 'IT Maintenance') -eq "No"){
             RebootDeny
         }
         else{
